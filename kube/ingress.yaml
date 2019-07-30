@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cronjob-dashboard-ingress
+  namespace: cronjob-dashboard
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: pushboard.jobtome.io
+    external-dns.alpha.kubernetes.io/ttl: "200"
+    certmanager.k8s.io/cluster-issuer: production
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    kubernetes.io/ingress.class: "gce"
+  labels:
+    app: cronjob-dashboard-ingress
+spec:
+  backend:
+    serviceName: cronjob-dashboard-service
+    servicePort: http
+  tls:
+    - secretName: cronjob-dashboard-prod-tls
+      hosts:
+        - pushboard.jobtome.io

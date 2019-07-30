@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cronjob-dashboard
+  namespace: cronjob-dashboard
+  labels:
+    app: cronjob-dashboard
+    type: webapp
+    language: php
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: cronjob-dashboard
+  template:
+    metadata:
+      labels:
+        app: cronjob-dashboard
+    spec:
+      containers:
+        - name: app
+          image: gdiener/k8s-dashboard-cronjob-app:v0.0.5
+          envFrom:
+          - secretRef:
+              name: environment-file-secret
+          ports:
+            - name: fpm-port
+              containerPort: 9000
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 250m
+              memory: 250Mi
+          livenessProbe:
+            tcpSocket:
+              port: fpm-port
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 2
+        - name: nginx
+          image: gdiener/k8s-dashboard-cronjob-nginx:v0.0.5
+          ports:
+            - name: webserver-port
+              containerPort: 8080
+          env:
+            - name: SERVICE_UPSTREAM
+              value: "localhost"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 250m
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: webserver-port
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: webserver-port
+            initialDelaySeconds: 15
+            periodSeconds: 20

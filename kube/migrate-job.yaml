@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cronjob-dashboard-migration-${CI_COMMIT_TAG}
+  namespace: cronjob-dashboard
+  labels:
+    app: cronjob-dashboard
+    type: migration
+    language: php
+spec:
+  backoffLimit: 4
+  activeDeadlineSeconds: 3600
+  ttlSecondsAfterFinished: 10
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - name: app
+          image: gdiener/k8s-dashboard-cronjob-app:v0.0.5
+          command: [ "php", "artisan", "migrate" ]
+          envFrom:
+          - secretRef:
+              name: environment-file-secret
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 250m
+              memory: 250Mi
+      restartPolicy: Never
