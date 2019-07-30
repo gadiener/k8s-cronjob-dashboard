@@ -1,0 +1,50 @@
+server {
+    listen 8080;
+    listen [::]:8080;
+
+    server_name _ default_server;
+
+    root /app/public;
+
+    add_header x-frame-options "SAMEORIGIN";
+    add_header x-xss-protection "1; mode=block";
+    add_header x-content-type-options "nosniff";
+
+    index index.html index.htm index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
+    location = /robots.txt  {
+        access_log off;
+        log_not_found off;
+    }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        add_header "Access-Control-Allow-Origin" "$http_origin";
+        add_header "Access-Control-Allow-Credentials" "true";
+        add_header "Access-Control-Allow-Methods" "GET, POST, DELETE, PUT, OPTIONS";
+        add_header "Access-Control-Allow-Headers" "Keep-Alive,User-Agent,If-Modified-Since,Cache-Control,Content-Type,Authorization";
+        add_header "Access-Control-Max-Age" "1728000";
+
+        include fastcgi_params;
+
+        fastcgi_pass ${SERVICE_UPSTREAM}:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
