@@ -8,10 +8,6 @@ Auth::routes([
     'verify'    => false
 ]);
 
-Route::get('healthcheck', function() {
-    return 'ok';
-});
-
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('users', 'UserController', ['except' => ['show']]);
 

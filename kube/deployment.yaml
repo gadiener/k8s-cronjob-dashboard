@@ -63,13 +63,13 @@ spec:
               memory: 100Mi
           readinessProbe:
             httpGet:
-              path: /healthcheck
+              path: /api/healthcheck
               port: webserver-port
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /healthcheck
+              path: /api/healthcheck
               port: webserver-port
             initialDelaySeconds: 15
             periodSeconds: 20

@@ -4,7 +4,7 @@ metadata:
   name: cronjob-dashboard-ingress
   namespace: cronjob-dashboard
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: pushboard.jobtome.io
+    external-dns.alpha.kubernetes.io/hostname: pushboard.example.com
     external-dns.alpha.kubernetes.io/ttl: "200"
     certmanager.k8s.io/cluster-issuer: production
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
@@ -18,4 +18,4 @@ spec:
   tls:
     - secretName: cronjob-dashboard-prod-tls
       hosts:
-        - pushboard.jobtome.io
+        - pushboard.example.com
